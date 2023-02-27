@@ -20,3 +20,77 @@ h6 {
 p {
     color: var(--paragraph-text-color);
 }
+
+/*FLEX*/
+
+.d-flex {
+    display: flex;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.align-center {
+    align-items: center;
+}
+
+/*MARGIN*/
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+/*FONT*/
+
+.font-s-xl {
+    font-size: 2.5rem;
+}
+
+.font-s-lg {
+    font-size: 2.0rem;
+}
+
+/*WIDTH*/
+
+.wv-60 {
+    width: 60vw;
+}
+
+/*HEIGHT*/
+
+.vh-50 {
+    height: 50vh;
+}
+
+/*BORDER*/
+
+.border-solid {
+    border-style: solid;
+}
+
+.border-1 {
+    border-width: 1px;
+}
+
+.border-r-5 {
+    border-radius: 5px;
+}
+
+/*Background color*/
+
+.bg-darker-blue {
+    background-color: var(--darker-blue-color);
+}
+
+.bg-white {
+    background-color: var(--white-color);
+}
+
+/*Text color*/
+
+.text-white {
+    color: var(--white-color);
+}
+
+/*Select Styles*/
