@@ -13,8 +13,19 @@
     <h1 class="font-s-xl">Tic Tac Toe</h1>
   </header>
   <main class="d-flex justify-center">
-    <div class="wv-60 bg-white mt-20 border-1 border-r-5 border-solid">
-      <h2>Here is the Game Board</h2>
+    <div class="wv-60 bg-white mt-20 border-1 border-r-5 border-solid box-shadow-1">
+      <div class="select-container position-relative d-flex direction-column w-fit-content align-center">
+        <select name="difficulty-select" id="difficulty-select" class="d-none difficulty-select">
+        </select>
+        <div class="w-130 bg-darker-blue m-20  border-r-5">
+          <button id="pretty-select" class="d-flex align-center justify-between cursor-pointer p-20">
+            <p class="select-text text-white"></p>
+            <img id="drop-down-arrow" class="rotate-down transition-eio-regular"
+              src="./src/assets/svg/arrow_drop_down_FILL0_wght400_GRAD0_opsz48.svg" alt="drop-down-arrow">
+          </button>
+        </div>
+        <div id="options-container" class="position-absolute d-flex top-80 gap-10 direction-column "></div>
+      </div>
     </div>
   </main>
   <script type="module" src="/src/main.ts"></script>
