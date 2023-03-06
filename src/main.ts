@@ -1,10 +1,27 @@
-import type { difficultyType } from './types/types.js'
+import type {
+  difficultyType,
+  playerSymbolType,
+  playerReturnType,
+} from './types/types.js'
 import './main.css'
+
+/* PLAYER FACTORY FUNCTION */
+
+const PlayerFactory = (symbol: playerSymbolType): playerReturnType => {
+  const playerSymbol = symbol
+  let playerScore = 0
+
+  const incrementPlayerScore = (): number => playerScore++
+
+  return { playerScore, playerSymbol, incrementPlayerScore }
+}
+
+const firstPlayer = PlayerFactory('X')
 
 /* MODULE FOR GAME RULES */
 
 const gameRulesModule = (() => {
-  const difficultyLevels = ['Easy', 'Medium', 'Hard', 'Impossible']
+  const difficultyLevels = ['Easy', 'Medium', 'Hard', 'Impossible', 'VS Player']
   let difficultySelected: difficultyType = 'Easy'
 
   const changeDifficultyLevel = (difficulty: difficultyType): void => {
@@ -21,7 +38,7 @@ const gameRulesModule = (() => {
 /* ------------------- */
 
 /* SELECT LOGIC */
-;(() => {
+const prettySelectModule = (() => {
   /* STANDARD SELECT QUERY SELECTOR */
   const selectElement: HTMLSelectElement = document.querySelector(
     '#difficulty-select'
@@ -29,15 +46,13 @@ const gameRulesModule = (() => {
   /* ------------------- */
 
   /* POPULATE STANDARD SELECT WITH THE GIVEN DIFFICULTIES */
-  ;(function () {
-    gameRulesModule.difficultyLevels.map((option) => {
-      const optionElement = document.createElement('option')
-      optionElement.setAttribute('value', option)
-      optionElement.textContent = option
-      selectElement?.appendChild(optionElement)
-      return ''
-    })
-  })()
+  gameRulesModule.difficultyLevels.map((option) => {
+    const optionElement = document.createElement('option')
+    optionElement.setAttribute('value', option)
+    optionElement.textContent = option
+    selectElement?.appendChild(optionElement)
+    return ''
+  })
   /* ------------------- */
 
   /* PRETTY SELECT QUERY SELECTOR */
@@ -91,7 +106,7 @@ const gameRulesModule = (() => {
   /* ------------------- */
 
   /* CREATE PRETTY SELECTOR OPTIONS */
-  ;(() => {
+  const createPrettySelector = (): void => {
     gameRulesModule.difficultyLevels.map((difficulty, index) => {
       const buttonContainer = document.createElement('div')
       buttonContainer.classList.add(
@@ -141,7 +156,7 @@ const gameRulesModule = (() => {
     })
 
     selectContainer.appendChild(optionsContainer)
-  })()
+  }
   /* ------------------- */
 
   /* EVENTS */
@@ -151,4 +166,37 @@ const gameRulesModule = (() => {
     showOptions()
   })
   /* ------------------- */
+
+  return { createPrettySelector }
 })()
+
+const gameBoardModule = (() => {
+  const board = document.querySelector('#game-board')
+  const boardArray = ['', '', '', '', '', '', '', '', '']
+
+  const createGameBoard = (): void => {
+    boardArray.forEach((square, index) => {
+      const button: HTMLButtonElement = document.createElement('button')
+      button.classList.add(
+        'box-shadow-1',
+        'bg-pink',
+        'border-r-5',
+        'cursor-pointer',
+        'font-s-symbols',
+        'bold'
+      )
+      button.innerText = square
+      button.addEventListener('click', () => {
+        button.innerText = firstPlayer.playerSymbol
+        boardArray.splice(index, 1, firstPlayer.playerSymbol)
+      })
+
+      board?.appendChild(button)
+    })
+  }
+
+  return { createGameBoard }
+})()
+
+prettySelectModule.createPrettySelector()
+gameBoardModule.createGameBoard()
