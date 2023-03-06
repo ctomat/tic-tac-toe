@@ -8,10 +8,19 @@ import './main.css'
 /* PLAYER FACTORY FUNCTION */
 
 const PlayerFactory = (symbol: playerSymbolType): playerReturnType => {
+  const counter = document.querySelector(
+    `#${symbol.toLowerCase()}-counter`
+  ) as HTMLElement
   const playerSymbol = symbol
   let playerScore = 0
 
-  const incrementPlayerScore = (): number => playerScore++
+  const updateScore = (): void => {
+    counter.textContent = playerScore.toString()
+  }
+  const incrementPlayerScore = (): void => {
+    playerScore++
+    updateScore()
+  }
 
   return { playerScore, playerSymbol, incrementPlayerScore }
 }
