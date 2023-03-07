@@ -32,15 +32,27 @@ const firstPlayer = PlayerFactory('X')
 const gameRulesModule = (() => {
   const difficultyLevels = ['Easy', 'Medium', 'Hard', 'Impossible', 'VS Player']
   let difficultySelected: difficultyType = 'Easy'
+  let playerTurn: playerSymbolType = 'X'
 
   const changeDifficultyLevel = (difficulty: difficultyType): void => {
     difficultySelected = difficulty
+  }
+
+  const playTurn = (): string => {
+    const turn = playerTurn
+    if (playerTurn === 'X') {
+      playerTurn = 'O'
+    } else {
+      playerTurn = 'X'
+    }
+    return turn
   }
 
   return {
     difficultyLevels,
     difficultySelected,
     changeDifficultyLevel,
+    playTurn,
   }
 })()
 
@@ -196,7 +208,10 @@ const gameBoardModule = (() => {
       )
       button.innerText = square
       button.addEventListener('click', () => {
-        button.innerText = firstPlayer.playerSymbol
+        if (button.innerText !== square) {
+          return
+        }
+        button.innerText = gameRulesModule.playTurn()
         boardArray.splice(index, 1, firstPlayer.playerSymbol)
       })
 
