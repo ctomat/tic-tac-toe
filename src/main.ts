@@ -197,25 +197,55 @@ const gameBoardModule = (() => {
 
   const createGameBoard = (): void => {
     boardArray.forEach((square, index) => {
+      const flipCard = document.createElement('div')
+      const flipCardInner = document.createElement('div')
+      const flipCardFront = document.createElement('div')
+      const flipCardBack = document.createElement('div')
       const button: HTMLButtonElement = document.createElement('button')
-      button.classList.add(
+
+      flipCard.classList.add('flip-card')
+
+      flipCardInner.classList.add('w-100p', 'h-100p', 'flip-card-inner')
+
+      flipCardFront.classList.add(
+        'flip-card-front',
         'box-shadow-1',
         'bg-pink',
         'border-r-5',
-        'cursor-pointer',
-        'font-s-symbols',
-        'bold'
+        'w-100p',
+        'h-100p'
       )
+      flipCardBack.classList.add(
+        'flip-card-back',
+        'box-shadow-1',
+        'bg-pink',
+        'border-r-5',
+        'w-100p',
+        'h-100p',
+        'font-s-symbols',
+        'bold',
+        'd-flex',
+        'justify-center',
+        'align-center'
+      )
+
+      button.classList.add('cursor-pointer')
       button.innerText = square
       button.addEventListener('click', () => {
-        if (button.innerText !== square) {
+        if (flipCardBack.innerText !== '') {
           return
         }
-        button.innerText = gameRulesModule.playTurn()
+        flipCardBack.innerText = gameRulesModule.playTurn()
         boardArray.splice(index, 1, firstPlayer.playerSymbol)
+        flipCard.classList.add('flip-card-click')
       })
 
-      board?.appendChild(button)
+      flipCardFront.appendChild(button)
+      flipCardInner.appendChild(flipCardFront)
+      flipCardInner.appendChild(flipCardBack)
+      flipCard.appendChild(flipCardInner)
+
+      board?.appendChild(flipCard)
     })
   }
 
