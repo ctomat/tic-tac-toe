@@ -1,4 +1,4 @@
-type difficultyType = 'Easy' | 'Medium' | 'Hard' | 'Impossible'
+type difficultyType = 'Easy' | 'Medium' | 'Hard' | 'Impossible' | 'VS Player'
 type playerSymbolType = 'X' | 'O'
 interface playerReturnType {
   playerScore: number

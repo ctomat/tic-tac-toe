@@ -27,24 +27,27 @@
         <div id="options-container" class="position-absolute d-flex top-80 gap-10 direction-column "></div>
       </div>
       <div id="counters-container" class="d-flex justify-center gap-10">
-        <div
-          class="d-flex align-center justify-around border-bottom-solid border-pink border-5 gap-15 w-200 bg-darker-blue text-white border-r-10 h-50">
+        <button id="x-counter"
+          class="d-flex align-center justify-around border-bottom-solid border-pink transition-eio-regular border-5 gap-15 w-200 bg-darker-blue text-white border-r-10 h-50">
           <div>
             <p class="text-white bold">X</p>
           </div>
           <div>
-            <p id="x-counter" class="text-white bold">-</p>
+            <p id="x-counter-number" class="text-white bold">-</p>
           </div>
-        </div>
-        <div
-          class="d-flex align-center justify-around border-bottom-solid border-pink border-5 gap-15 w-200 bg-darker-blue text-white border-r-10 h-50">
+        </button>
+        <button id="o-counter"
+          class="d-flex align-center justify-around border-bottom-solid transition-eio-regular border-5 gap-15 w-200 bg-darker-blue text-white border-r-10 h-50">
           <div>
             <p class="text-white bold">O</p>
           </div>
           <div>
-            <p id="o-counter" class="text-white bold">-</p>
+            <p id="o-counter-number" class="text-white bold">-</p>
           </div>
-        </div>
+        </button>
+      </div>
+      <div class="d-flex justify-center mt-20">
+        <p>Start game or select player</p>
       </div>
       <div id="game-board"
         class="w-100p h-400 d-grid template-columns-3-100px template-rows-3-100px gap-15 place-content-center">

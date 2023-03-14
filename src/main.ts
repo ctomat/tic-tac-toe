@@ -9,7 +9,7 @@ import './main.css'
 
 const PlayerFactory = (symbol: playerSymbolType): playerReturnType => {
   const counter = document.querySelector(
-    `#${symbol.toLowerCase()}-counter`
+    `#${symbol.toLowerCase()}-counter-number`
   ) as HTMLElement
   const playerSymbol = symbol
   let playerScore = 0
@@ -25,17 +25,24 @@ const PlayerFactory = (symbol: playerSymbolType): playerReturnType => {
   return { playerScore, playerSymbol, incrementPlayerScore }
 }
 
-const firstPlayer = PlayerFactory('X')
-
 /* MODULE FOR GAME RULES */
-
-const gameRulesModule = (() => {
-  const difficultyLevels = ['Easy', 'Medium', 'Hard', 'Impossible', 'VS Player']
-  let difficultySelected: difficultyType = 'Easy'
+const gameModule = (() => {
+  const playerOne = PlayerFactory('X')
+  const counterX = document.querySelector('#x-counter')
+  const counterO = document.querySelector('#o-counter')
+  const difficultyLevels = ['VS Player', 'Easy', 'Medium', 'Hard', 'Impossible']
+  let difficultySelected: difficultyType = 'VS Player'
   let playerTurn: playerSymbolType = 'X'
 
   const changeDifficultyLevel = (difficulty: difficultyType): void => {
     difficultySelected = difficulty
+  }
+
+  const updateTurnIndicator = (): void => {
+    setTimeout(() => {
+      counterX?.classList.toggle('border-pink')
+      counterO?.classList.toggle('border-pink')
+    }, 400)
   }
 
   const playTurn = (): string => {
@@ -45,13 +52,20 @@ const gameRulesModule = (() => {
     } else {
       playerTurn = 'X'
     }
+    updateTurnIndicator()
     return turn
   }
 
+  const getTurn = (): playerSymbolType => {
+    return playerTurn
+  }
+
   return {
+    playerOne,
     difficultyLevels,
     difficultySelected,
     changeDifficultyLevel,
+    getTurn,
     playTurn,
   }
 })()
@@ -67,7 +81,7 @@ const prettySelectModule = (() => {
   /* ------------------- */
 
   /* POPULATE STANDARD SELECT WITH THE GIVEN DIFFICULTIES */
-  gameRulesModule.difficultyLevels.map((option) => {
+  gameModule.difficultyLevels.map((option) => {
     const optionElement = document.createElement('option')
     optionElement.setAttribute('value', option)
     optionElement.textContent = option
@@ -128,7 +142,7 @@ const prettySelectModule = (() => {
 
   /* CREATE PRETTY SELECTOR OPTIONS */
   const createPrettySelector = (): void => {
-    gameRulesModule.difficultyLevels.map((difficulty, index) => {
+    gameModule.difficultyLevels.map((difficulty, index) => {
       const buttonContainer = document.createElement('div')
       buttonContainer.classList.add(
         'select-option',
@@ -153,12 +167,12 @@ const prettySelectModule = (() => {
       buttonContainer.appendChild(button)
       buttonContainer.addEventListener('click', (event) => {
         event.stopPropagation()
-        gameRulesModule.changeDifficultyLevel(difficulty as difficultyType)
+        gameModule.changeDifficultyLevel(difficulty as difficultyType)
         textElement.innerText = difficulty
         showOptions()
         changeArrowDirection()
       })
-      if (index === gameRulesModule.difficultyLevels.length - 1) {
+      if (index === gameModule.difficultyLevels.length - 1) {
         /* 
         Because of the setTimeout, if the click event was on the first button, the user could click repeatedly 
         to cancel the hide animation. 
@@ -193,59 +207,111 @@ const prettySelectModule = (() => {
 
 const gameBoardModule = (() => {
   const board = document.querySelector('#game-board')
-  const boardArray = ['', '', '', '', '', '', '', '', '']
+  const boardArray = [
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', ''],
+  ]
+
+  const checkWin = (
+    playerTurn: playerSymbolType
+  ): { player: playerSymbolType; win: boolean } => {
+    // Horizontal Win Checker
+    let horizontalWin = false
+    boardArray.forEach((row) => {
+      if (row.every((square) => square === playerTurn)) {
+        horizontalWin = true
+      }
+    })
+    // -------------------
+
+    // Vertical Win Checker
+    let verticalWin = false
+    for (let index = 0; index < boardArray.length; index++) {
+      if (boardArray.every((row) => row[index] === playerTurn)) {
+        verticalWin = true
+      }
+    }
+    // -------------------
+
+    // Transversal Win Checker
+    let transversalWin = false
+    if (boardArray.every((row, index) => row[index] === playerTurn)) {
+      transversalWin = true
+    }
+    if (
+      boardArray.every(
+        (row, index) => row[boardArray.length - (1 + index)] === playerTurn
+      )
+    ) {
+      transversalWin = true
+    }
+    // -------------------
+
+    if (horizontalWin || verticalWin || transversalWin) {
+      return { player: playerTurn, win: true }
+    }
+
+    return { player: playerTurn, win: false }
+  }
 
   const createGameBoard = (): void => {
-    boardArray.forEach((square, index) => {
-      const flipCard = document.createElement('div')
-      const flipCardInner = document.createElement('div')
-      const flipCardFront = document.createElement('div')
-      const flipCardBack = document.createElement('div')
-      const button: HTMLButtonElement = document.createElement('button')
+    boardArray.forEach((row) => {
+      row.forEach((square, index) => {
+        const flipCard = document.createElement('div')
+        const flipCardInner = document.createElement('div')
+        const flipCardFront = document.createElement('div')
+        const flipCardBack = document.createElement('div')
+        const button: HTMLButtonElement = document.createElement('button')
 
-      flipCard.classList.add('flip-card')
+        flipCard.classList.add('flip-card')
 
-      flipCardInner.classList.add('w-100p', 'h-100p', 'flip-card-inner')
+        flipCardInner.classList.add('w-100p', 'h-100p', 'flip-card-inner')
 
-      flipCardFront.classList.add(
-        'flip-card-front',
-        'box-shadow-1',
-        'bg-pink',
-        'border-r-5',
-        'w-100p',
-        'h-100p'
-      )
-      flipCardBack.classList.add(
-        'flip-card-back',
-        'box-shadow-1',
-        'bg-pink',
-        'border-r-5',
-        'w-100p',
-        'h-100p',
-        'font-s-symbols',
-        'bold',
-        'd-flex',
-        'justify-center',
-        'align-center'
-      )
+        flipCardFront.classList.add(
+          'flip-card-front',
+          'box-shadow-1',
+          'bg-pink',
+          'border-r-5',
+          'w-100p',
+          'h-100p'
+        )
+        flipCardBack.classList.add(
+          'flip-card-back',
+          'box-shadow-1',
+          'bg-pink',
+          'border-r-5',
+          'w-100p',
+          'h-100p',
+          'font-s-symbols',
+          'bold',
+          'd-flex',
+          'justify-center',
+          'align-center'
+        )
 
-      button.classList.add('cursor-pointer')
-      button.innerText = square
-      button.addEventListener('click', () => {
-        if (flipCardBack.innerText !== '') {
-          return
-        }
-        flipCardBack.innerText = gameRulesModule.playTurn()
-        boardArray.splice(index, 1, firstPlayer.playerSymbol)
-        flipCard.classList.add('flip-card-click')
+        button.classList.add('cursor-pointer')
+        button.innerText = square
+        button.addEventListener('click', () => {
+          if (flipCardBack.innerText !== '') {
+            return
+          }
+          const prevTurn = gameModule.getTurn()
+          flipCardBack.innerText = gameModule.playTurn()
+          row.splice(index, 1, flipCard.innerText)
+          flipCard.classList.add('flip-card-click')
+          if (checkWin(prevTurn).win && checkWin(prevTurn).player === 'X') {
+            gameModule.playerOne.incrementPlayerScore()
+          }
+        })
+
+        flipCardFront.appendChild(button)
+        flipCardInner.appendChild(flipCardFront)
+        flipCardInner.appendChild(flipCardBack)
+        flipCard.appendChild(flipCardInner)
+
+        board?.appendChild(flipCard)
       })
-
-      flipCardFront.appendChild(button)
-      flipCardInner.appendChild(flipCardFront)
-      flipCardInner.appendChild(flipCardBack)
-      flipCard.appendChild(flipCardInner)
-
-      board?.appendChild(flipCard)
     })
   }
 

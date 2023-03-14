@@ -189,7 +189,6 @@ p {
 
 .border-pink {
     border-color: var(--pink-background-color);
-    animation: border-animation 0.6s ease-in-out;
 }
 
 @keyframes border-animation {
@@ -249,10 +248,12 @@ p {
 
 .v-hidden {
     opacity: 0;
+    visibility: hidden;
 }
 
 .v-show {
     opacity: 1;
+    visibility: visible;
 }
 
 /*BOX SHADOW*/
