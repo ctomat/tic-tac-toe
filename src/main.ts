@@ -8,28 +8,40 @@ import './main.css'
 /* PLAYER FACTORY FUNCTION */
 
 const PlayerFactory = (symbol: playerSymbolType): playerReturnType => {
-  const counter = document.querySelector(
-    `#${symbol.toLowerCase()}-counter-number`
-  ) as HTMLElement
-  const playerSymbol = symbol
+  let playerSymbol = symbol
   let playerScore = 0
 
   const updateScore = (): void => {
+    const counter = document.querySelector(
+      `#${playerSymbol.toLowerCase()}-counter-number`
+    ) as HTMLElement
     counter.textContent = playerScore.toString()
   }
   const incrementPlayerScore = (): void => {
-    playerScore++
+    playerScore += 1
     updateScore()
   }
+  const getScore = (): number => {
+    return playerScore
+  }
+  const changePlayerSymbol = (): void => {
+    if (playerSymbol === 'X') {
+      playerSymbol = 'O'
+    } else {
+      playerSymbol = 'X'
+    }
+  }
 
-  return { playerScore, playerSymbol, incrementPlayerScore }
+  return { getScore, playerSymbol, incrementPlayerScore, changePlayerSymbol }
 }
 
 /* MODULE FOR GAME RULES */
 const gameModule = (() => {
   const playerOne = PlayerFactory('X')
-  const counterX = document.querySelector('#x-counter')
-  const counterO = document.querySelector('#o-counter')
+  const playerTwo = PlayerFactory('O')
+  const counterX = document.querySelector('#x-counter') as HTMLButtonElement
+  const counterO = document.querySelector('#o-counter') as HTMLButtonElement
+  const starterMessage = document.querySelector('#starter-message') as HTMLElement
   const difficultyLevels = ['VS Player', 'Easy', 'Medium', 'Hard', 'Impossible']
   let difficultySelected: difficultyType = 'VS Player'
   let playerTurn: playerSymbolType = 'X'
@@ -45,6 +57,19 @@ const gameModule = (() => {
     }, 400)
   }
 
+  const changeStarterMessage = (): void => {
+    starterMessage.innerText = `Turn of ${playerTurn}`
+  }
+
+  counterO?.addEventListener('click', () => {
+    if (playerOne.playerSymbol === 'X' && difficultySelected !== 'VS Player') {
+      playerOne.playerSymbol = 'O'
+      playerTwo.playerSymbol = 'X'
+      playerTurn = 'O'
+      updateTurnIndicator()
+      changeStarterMessage()
+    }
+  })
   const playTurn = (): string => {
     const turn = playerTurn
     if (playerTurn === 'X') {
@@ -62,9 +87,11 @@ const gameModule = (() => {
 
   return {
     playerOne,
+    playerTwo,
     difficultyLevels,
     difficultySelected,
     changeDifficultyLevel,
+    changeStarterMessage,
     getTurn,
     playTurn,
   }
@@ -300,9 +327,24 @@ const gameBoardModule = (() => {
           flipCardBack.innerText = gameModule.playTurn()
           row.splice(index, 1, flipCard.innerText)
           flipCard.classList.add('flip-card-click')
-          if (checkWin(prevTurn).win && checkWin(prevTurn).player === 'X') {
+          console.log({
+            playerOneSymbol: gameModule.playerOne.playerSymbol,
+            playerTwoSymbol: gameModule.playerTwo.playerSymbol,
+            checkWinReturnValue: checkWin(prevTurn),
+            score: gameModule.playerOne.getScore(),
+          })
+          if (
+            checkWin(prevTurn).win &&
+            checkWin(prevTurn).player === gameModule.playerOne.playerSymbol
+          ) {
             gameModule.playerOne.incrementPlayerScore()
+          } else if (
+            checkWin(prevTurn).win &&
+            checkWin(prevTurn).player === gameModule.playerTwo.playerSymbol
+          ) {
+            gameModule.playerTwo.incrementPlayerScore()
           }
+          setTimeout(gameModule.changeStarterMessage, 400)
         })
 
         flipCardFront.appendChild(button)
