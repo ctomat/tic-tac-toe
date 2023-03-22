@@ -57,8 +57,8 @@ const gameModule = (() => {
     }, 400)
   }
 
-  const changeStarterMessage = (): void => {
-    starterMessage.innerText = `Turn of ${playerTurn}`
+  const changeStarterMessage = (message: string): void => {
+    starterMessage.innerText = message
   }
 
   counterO?.addEventListener('click', () => {
@@ -67,9 +67,9 @@ const gameModule = (() => {
       playerTwo.playerSymbol = 'X'
       playerTurn = 'O'
       updateTurnIndicator()
-      changeStarterMessage()
     }
   })
+
   const playTurn = (): string => {
     const turn = playerTurn
     if (playerTurn === 'X') {
@@ -234,11 +234,27 @@ const prettySelectModule = (() => {
 
 const gameBoardModule = (() => {
   const board = document.querySelector('#game-board')
+  let roundWin = false
   const boardArray = [
     ['', '', ''],
     ['', '', ''],
     ['', '', ''],
   ]
+
+  const checkTie = (): boolean => {
+    let newArray: string[] = []
+    let isTie = false
+
+    boardArray.forEach((row) => {
+      newArray = newArray.concat(row)
+    })
+
+    if (newArray.every((element) => element !== '')) {
+      isTie = true
+    }
+
+    return isTie
+  }
 
   const checkWin = (
     playerTurn: playerSymbolType
@@ -282,6 +298,32 @@ const gameBoardModule = (() => {
     return { player: playerTurn, win: false }
   }
 
+  const cleanGameBoard = (): void => {
+    roundWin = true
+    const allCards = document.querySelectorAll('.flip-card-click')
+    const allBackCards = document.querySelectorAll('.flip-card-back')
+    for (let firstIndex = 0; firstIndex < boardArray.length; firstIndex++) {
+      for (
+        let secondIndex = 0;
+        secondIndex < boardArray[firstIndex].length;
+        secondIndex++
+      ) {
+        boardArray[firstIndex].splice(secondIndex, 1, '')
+      }
+    }
+    setTimeout(() => {
+      allCards.forEach((card) => {
+        card.classList.remove('flip-card-click')
+      })
+    }, 1000)
+    setTimeout(() => {
+      allBackCards.forEach((cards) => {
+        cards.textContent = ''
+      })
+      roundWin = false
+    }, 1200)
+  }
+
   const createGameBoard = (): void => {
     boardArray.forEach((row) => {
       row.forEach((square, index) => {
@@ -303,6 +345,7 @@ const gameBoardModule = (() => {
           'w-100p',
           'h-100p'
         )
+
         flipCardBack.classList.add(
           'flip-card-back',
           'box-shadow-1',
@@ -320,31 +363,31 @@ const gameBoardModule = (() => {
         button.classList.add('cursor-pointer')
         button.innerText = square
         button.addEventListener('click', () => {
-          if (flipCardBack.innerText !== '') {
+          if (flipCardBack.innerText !== '' || roundWin) {
             return
           }
           const prevTurn = gameModule.getTurn()
           flipCardBack.innerText = gameModule.playTurn()
           row.splice(index, 1, flipCard.innerText)
           flipCard.classList.add('flip-card-click')
-          console.log({
-            playerOneSymbol: gameModule.playerOne.playerSymbol,
-            playerTwoSymbol: gameModule.playerTwo.playerSymbol,
-            checkWinReturnValue: checkWin(prevTurn),
-            score: gameModule.playerOne.getScore(),
-          })
           if (
             checkWin(prevTurn).win &&
             checkWin(prevTurn).player === gameModule.playerOne.playerSymbol
           ) {
             gameModule.playerOne.incrementPlayerScore()
+            cleanGameBoard()
           } else if (
             checkWin(prevTurn).win &&
             checkWin(prevTurn).player === gameModule.playerTwo.playerSymbol
           ) {
             gameModule.playerTwo.incrementPlayerScore()
+            cleanGameBoard()
+          } else if (checkTie()) {
+            cleanGameBoard()
           }
-          setTimeout(gameModule.changeStarterMessage, 400)
+          setTimeout(() => {
+            gameModule.changeStarterMessage(`Turn of ${gameModule.getTurn()}`)
+          }, 400)
         })
 
         flipCardFront.appendChild(button)
